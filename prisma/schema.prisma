@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  PASTOR
+  FINANCEIRO
+  COORDENADOR
+  LIDER_GC
+  VOLUNTARIO
+  MEMBRO
+}
+
+model Church {
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String       @unique
+  createdAt DateTime     @default(now())
+  members   Membership[]
+  people    Person[]
+  ministries Ministry[]
+  auditLogs AuditLog[]
+}
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String
+  email        String       @unique
+  passwordHash String
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  memberships  Membership[]
+  sessions     Session[]
+}
+
+model Membership {
+  churchId  String  @db.Uuid
+  userId    String  @db.Uuid
+  role      Role    @default(MEMBRO)
+  church    Church  @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([churchId, userId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  tokenHash String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Person {
+  id        String   @id @default(uuid()) @db.Uuid
+  churchId  String   @db.Uuid
+  fullName  String   @db.VarChar(160)
+  email     String?  @db.VarChar(254)
+  phone     String?  @db.VarChar(30)
+  createdAt DateTime @default(now())
+  church    Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  @@index([churchId, fullName])
+}
+
+model Ministry {
+  id          String   @id @default(uuid()) @db.Uuid
+  churchId    String   @db.Uuid
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  @@unique([churchId, name])
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  churchId   String   @db.Uuid
+  actorId    String?  @db.Uuid
+  entityType String
+  entityId   String   @db.Uuid
+  operation  String
+  createdAt  DateTime @default(now())
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  @@index([churchId, createdAt])
+}

@@ -1,71 +1,55 @@
 # Lagoinha Gestão
 
-Plataforma de gestão ministerial da **Lagoinha Além Paraíba**.
+Sistema de gestão da Lagoinha Além Paraíba — **Next.js + TypeScript + PostgreSQL + Prisma + Docker**.
 
-> Grande para servir, pequena para se importar.
+Desenvolvimento: branch `create`. Implantação: infraestrutura própria, sem Supabase ou Vercel.
 
-## Fase 1 — Fundação
+## Requisitos
 
-- Next.js App Router, TypeScript e Tailwind CSS.
-- Interface responsiva inspirada na comunicação institucional da igreja.
-- Login com Supabase Auth, páginas protegidas e encerramento de sessão.
-- Dashboard com números reais do banco (sem dados fictícios).
-- Cadastro e listagem de pessoas e ministérios.
-- PostgreSQL com isolamento por igreja, políticas RLS e trilha de auditoria.
-- Preparação para os módulos Escalas, GCs, Financeiro e Pastoral.
+- Node.js 22+
+- Docker com Docker Compose v2
 
-## Executar localmente
-
-Requisitos: Node.js 20+ e um projeto Supabase.
+## Início rápido (aplicação e Postgres em Docker)
 
 ```bash
+cp .env.example .env
+# EDITE .env: defina uma senha forte em POSTGRES_PASSWORD
+docker compose up --build -d
+# Para criar o primeiro usuário admin, rode o seed uma vez:
+docker compose exec -e ADMIN_EMAIL=admin@exemplo.com -e ADMIN_PASSWORD='SENHA-FORTE-AQUI' app npm run db:seed
+```
+
+Acesse http://localhost:3000. Docker executa `prisma migrate deploy` ao iniciar a aplicação.
+
+**Atenção:** troque o email e a senha de exemplo. Não salve credenciais no Git.
+
+## Desenvolvimento Node local + banco em Docker
+
+```bash
+cp .env.example .env
+# Ajuste POSTGRES_PASSWORD e DATABASE_URL para refletir a mesma senha
+docker compose up -d db
 npm install
-cp .env.example .env.local
+npm run db:generate
+npm run db:deploy
+ADMIN_EMAIL=admin@exemplo.com ADMIN_PASSWORD='SENHA-FORTE-AQUI' npm run db:seed
 npm run dev
 ```
 
-Configure `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` no `.env.local`.
+É importante que a senha de `DATABASE_URL` esteja codificada para URL se possuir caracteres especiais.
 
-No Supabase SQL Editor, execute `supabase/migrations/0001_foundation.sql`. Desative o cadastro público de usuários no painel Auth até implementar convites.
+## Banco e permissões
 
-### Primeiro administrador
+O schema está em `prisma/schema.prisma`; migrações versionadas em `prisma/migrations`.
+- Church, User, Membership, Session, Person, Ministry, AuditLog.
+- Sessões opacas armazenadas no PostgreSQL por hash SHA-256; cookie HttpOnly SameSite=Lax.
+- Senhas com bcrypt (12 rounds).
+- Todas as queries de pessoas/ministérios filtram `churchId` autenticado.
+- Criação de pessoas/ministérios disponível para ADMIN/PASTOR; leitura de pessoas para ADMIN/PASTOR/COORDENADOR.
+- Cadastro de usuários restrito ao seed nesta etapa. Convites e gestão de perfis virão depois.
 
-1. Crie um usuário no painel Supabase Authentication (ou convide-o).
-2. Encontre seu UUID em Authentication > Users.
-3. No SQL Editor, substitua `SEU_AUTH_USER_UUID` e execute:
-
-```sql
-insert into public.profiles (id, display_name)
-values ('SEU_AUTH_USER_UUID', 'Administrador')
-on conflict (id) do update set display_name = excluded.display_name;
-
-insert into public.church_memberships (church_id, user_id, role)
-select id, 'SEU_AUTH_USER_UUID', 'admin'
-from public.churches where slug = 'lagoinha-alem-paraiba'
-on conflict (church_id, user_id) do update set role = excluded.role;
-```
-
-Acesse `http://localhost:3000/login` com esse usuário.
-
-**Nunca inclua chaves secretas / service_role no frontend ou no Git.** A chave publishable/anon funciona exclusivamente com RLS corretamente aplicada.
-
-## Estrutura
-
-- `src/app/(auth)/login`: autenticação.
-- `src/app/(app)`: área protegida.
-- `src/lib/supabase`: clientes SSR e sessão.
-- `src/components`: navegação e elementos reutilizáveis.
-- `supabase/migrations`: modelo de dados, políticas e auditoria.
-
-## Segurança
-
-Este projeto lida com dados pessoais potencialmente sensíveis. As políticas do banco restringem acesso por vínculo e papel; não armazene anotações pastorais confidenciais nesta fase. Não habilite cadastros públicos antes do fluxo de aprovação/convites.
+**Antes do servidor público:** implantar HTTPS com proxy reverso, backups automatizados, regras de firewall, rate limit de login, testes automatizados de autorização e recuperação de senha. O PostgreSQL já está mapeado exclusivamente em `127.0.0.1` na máquina.
 
 ## Próximas etapas
 
-1. Validar marca (cores e arquivos de logo oficiais).
-2. Configurar Supabase e Vercel com variáveis por ambiente.
-3. Criar fluxo de convites, edição de usuários, testes E2E e CI.
-4. Iniciar módulo Voluntários e Escalas.
-
-Código da fase inicial na branch `create`. Não foi feito deploy automático.
+Confirmar identidade visual oficial, finalizar convites/gestão de usuários e executar testes antes de usar dados pessoais reais.

@@ -1,17 +1,17 @@
 "use server";
+import { compare } from "bcryptjs";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import { createSession, destroySession } from "@/lib/auth";
 export async function login(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   if (!email || !password) redirect("/login?error=1");
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect("/login?error=1");
+  const user = await prisma.user.findUnique({ where: { email }, include: { memberships: { take: 1 } } });
+  if (!user?.active || !user.memberships.length || !(await compare(password, user.passwordHash))) {
+    redirect("/login?error=1");
+  }
+  await createSession(user.id);
   redirect("/dashboard");
 }
-export async function logout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/login");
-}
+export async function logout() { await destroySession(); redirect("/login"); }

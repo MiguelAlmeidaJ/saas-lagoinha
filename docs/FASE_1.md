@@ -1,28 +1,19 @@
-# Fase 1 — Fundação
+# Fase 1 — Fundação (PostgreSQL + Prisma + Docker)
 
-## Entregue no primeiro commit
+## Implementado
+- [x] Next.js + TypeScript + Tailwind CSS
+- [x] Prisma schema e migration inicial
+- [x] Dockerfile e docker-compose com PostgreSQL 16
+- [x] Login e logout com sessões no PostgreSQL
+- [x] Controles de acesso por papel e igreja
+- [x] Dashboard com contagens do banco
+- [x] Cadastros de pessoas e ministérios com auditoria de criação
+- [x] Seed manual do primeiro administrador
 
-- [x] Estrutura Next.js + TypeScript + Tailwind
-- [x] Login e logout usando Supabase Auth
-- [x] Proteção por sessão e vínculo com igreja
-- [x] Dashboard com dados do banco
-- [x] Cadastro e listagem de pessoas
-- [x] Cadastro e listagem de ministérios
-- [x] Modelo de dados com church_id
-- [x] RLS de isolamento, papéis e trilha de auditoria
-- [x] Layout responsivo baseado na comunicação da igreja
-
-## Antes de utilizar dados reais
-
-- [ ] Instalar dependências e executar build, lint e testes em ambiente de desenvolvimento
-- [ ] Configurar projeto Supabase e aplicar migrações na ordem
-- [ ] Criar primeiro usuário e vínculo admin
-- [ ] Testar RLS com usuários de igrejas distintas e perfis distintos
-- [ ] Implementar convites e recuperação de senha
-- [ ] Rever acesso a dados pessoais conforme necessidade operacional e LGPD
-- [ ] Validar identidade visual com arquivos oficiais e ajustar design tokens
-- [ ] Configurar CI, backups e monitoramento
-
-## Escopo fora desta fase
-
-Escalas, pequenos grupos, financeiro e acompanhamento pastoral. O menu exibe esses módulos como futuros, sem funcionalidades simuladas.
+## Pendente antes de uso real
+- [ ] Executar npm install, testes de build, migrações e fluxo completo de login em ambiente configurado
+- [ ] Implementar rate limiting e recuperação de senha
+- [ ] Testar acesso cruzado de igrejas e permissões de todos os perfis
+- [ ] Validar identidade visual e assets oficiais
+- [ ] Implantar SSL, proxy reverso, backups e monitoramento no servidor próprio
+- [ ] Convites, gerenciamento de usuários, edição e exclusão auditada
