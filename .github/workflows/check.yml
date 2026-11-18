@@ -4,9 +4,26 @@ on:
     branches: [create, main]
   pull_request:
     branches: [main]
+
 jobs:
   checks:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: lagoinha_test
+          POSTGRES_USER: lagoinha
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lagoinha -d lagoinha_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://lagoinha:ci-only-password@localhost:5432/lagoinha_test?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +33,12 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+      - name: Apply Prisma migrations
+        run: npm run db:deploy
+      - name: Seed church and initial admin
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+          ADMIN_EMAIL: admin-ci@example.invalid
+          ADMIN_PASSWORD: ci-test-password-strong
+        run: npm run db:seed
+      - name: Verify PostgreSQL records and roles
+        run: node scripts/smoke-db.cjs
