@@ -35,6 +35,10 @@ model Church {
   swapRequests SwapRequest[]
   invitations Invitation[]
   passwordResets PasswordReset[]
+  growthGroups GrowthGroup[]
+  growthGroupMembers GrowthGroupMember[]
+  growthMeetings GrowthMeeting[]
+  growthAttendances GrowthAttendance[]
 }
 
 model User {
@@ -89,6 +93,9 @@ model Person {
   scheduleAssignments ScheduleAssignment[]
   unavailabilities Unavailability[]
   invitations Invitation[]
+  ledGrowthGroups GrowthGroup[]
+  growthGroupMembers GrowthGroupMember[]
+  growthAttendances GrowthAttendance[]
   @@unique([churchId, id])
   @@index([churchId, fullName])
 }
@@ -286,4 +293,74 @@ model PasswordReset {
   createdBy   User      @relation("PasswordResetIssuedBy", fields: [createdById], references: [id], onDelete: Restrict)
   @@index([churchId, userId])
   @@index([churchId, createdAt])
+}
+
+enum GrowthAttendanceStatus {
+  PRESENTE
+  AUSENTE
+  JUSTIFICADO
+}
+
+model GrowthGroup {
+  id          String   @id @default(uuid()) @db.Uuid
+  churchId    String   @db.Uuid
+  name        String   @db.VarChar(120)
+  leaderId    String   @db.Uuid
+  location    String?  @db.VarChar(160)
+  meetingDay  Int
+  meetingTime String   @db.VarChar(5)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  leader      Person   @relation(fields: [churchId, leaderId], references: [churchId, id], onDelete: Restrict)
+  members     GrowthGroupMember[]
+  meetings    GrowthMeeting[]
+  @@unique([churchId, id])
+  @@unique([churchId, name])
+  @@index([churchId, leaderId])
+}
+
+model GrowthGroupMember {
+  id         String   @id @default(uuid()) @db.Uuid
+  churchId   String   @db.Uuid
+  groupId    String   @db.Uuid
+  personId   String   @db.Uuid
+  active     Boolean  @default(true)
+  joinedAt   DateTime @default(now())
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  group      GrowthGroup @relation(fields: [churchId, groupId], references: [churchId, id], onDelete: Cascade)
+  person     Person   @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
+  attendances GrowthAttendance[]
+  @@unique([churchId, groupId, personId])
+  @@unique([churchId, id])
+  @@index([churchId, personId])
+}
+
+model GrowthMeeting {
+  id          String   @id @default(uuid()) @db.Uuid
+  churchId    String   @db.Uuid
+  groupId     String   @db.Uuid
+  startsAt    DateTime
+  theme       String?  @db.VarChar(160)
+  createdAt   DateTime @default(now())
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  group       GrowthGroup @relation(fields: [churchId, groupId], references: [churchId, id], onDelete: Cascade)
+  attendances GrowthAttendance[]
+  @@unique([churchId, id])
+  @@unique([churchId, groupId, startsAt])
+  @@index([churchId, startsAt])
+}
+
+model GrowthAttendance {
+  id          String   @id @default(uuid()) @db.Uuid
+  churchId    String   @db.Uuid
+  meetingId   String   @db.Uuid
+  memberId    String   @db.Uuid
+  status      GrowthAttendanceStatus
+  recordedAt  DateTime @default(now())
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  meeting     GrowthMeeting @relation(fields: [churchId, meetingId], references: [churchId, id], onDelete: Cascade)
+  member      GrowthGroupMember @relation(fields: [churchId, memberId], references: [churchId, id], onDelete: Cascade)
+  @@unique([churchId, meetingId, memberId])
+  @@index([churchId, memberId])
 }

@@ -67,3 +67,6 @@
 - [ ] Teste local no Docker, homologação da interface e revisão de deploy
 
 **Não marcar Fase 2 como validada para produção até realizar os itens pendentes.** O desenvolvimento funcional pode ser considerado avançado, mas testes locais continuam adiados conforme solicitação.
+
+## Transição para Fase 3
+Em 18/11/2026, foi autorizado iniciar a Fase 3. O último CI da Fase 2 passou, porém o encerramento para produção permanece condicionado a testes locais, E2E, concorrência e homologação. Essas pendências não bloqueiam a implementação de módulos novos.

@@ -3,16 +3,17 @@ import { UsersRound, HandHeart, House, CalendarDays, ArrowUpRight } from "lucide
 import { requireAccess, canViewPeople } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 export default async function Dashboard() {
-  const { churchId, role } = await requireAccess();
-  const [people, ministries] = await Promise.all([
+  const { churchId, role, user } = await requireAccess();
+  const [people, ministries, growthGroups] = await Promise.all([
     canViewPeople(role) ? prisma.person.count({where:{churchId}}) : Promise.resolve(null),
-    prisma.ministry.count({where:{churchId}})
+    prisma.ministry.count({where:{churchId}}),
+    ["ADMIN","PASTOR","LIDER_GC"].includes(role)?prisma.growthGroup.count({where:{churchId,active:true,...(role==="LIDER_GC"?{leader:{userId:user.id}}:{})}}):Promise.resolve(null)
   ]);
   const stats = [
     { label: "Pessoas cadastradas", value: people ?? "Restrito", icon: UsersRound, href: canViewPeople(role)?"/pessoas":"#" },
     { label: "Ministérios", value: ministries, icon: HandHeart, href: "/ministerios" },
-    { label: "GCs ativos", value: "Em breve", icon: House, href: "#" },
-    { label: "Escalas", value: "Em breve", icon: CalendarDays, href: "#" }
+    { label: "GCs ativos", value: growthGroups??"Restrito", icon: House, href: growthGroups===null?"#":"/gcs" },
+    { label: "Escalas", value: "Acessar", icon: CalendarDays, href: "/minhas-escalas" }
   ];
   return <div>
     <p className="eyebrow mb-3">Visão geral</p><h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Bem-vindo ao Lagoinha Gestão.</h1>

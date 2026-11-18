@@ -11,7 +11,7 @@ const items = [
   { href: "/usuarios", label: "Usuários e convites", icon: UserCog, active: true, roles: ["ADMIN","PASTOR"] as Role[] },
   { href: "/ministerios", label: "Ministérios", icon: HandHeart, active: true },
   { href: "/escalas", label: "Gerenciar escalas", icon: CalendarDays, active: true, roles: ["ADMIN","PASTOR","COORDENADOR"] as Role[] },
-  { href: "#", label: "Grupos de crescimento", icon: House, active: false },
+  { href: "/gcs", label: "Grupos de crescimento", icon: House, active: true, roles: ["ADMIN","PASTOR","LIDER_GC"] as Role[] },
   { href: "#", label: "Financeiro", icon: Wallet, active: false },
   { href: "#", label: "Pastoral", icon: HeartHandshake, active: false },
   { href: "#", label: "Configurações", icon: Settings, active: false },

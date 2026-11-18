@@ -50,3 +50,5 @@ jobs:
         run: node scripts/smoke-account-security.mjs
       - name: Verify ministry authorization and cross-church isolation
         run: npx tsx scripts/smoke-authorization.ts
+      - name: Verify growth groups database and tenant isolation
+        run: node scripts/smoke-growth-groups.mjs
