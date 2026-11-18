@@ -17,7 +17,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
           <div><label htmlFor="password" className="block text-sm font-semibold mb-2">Senha</label><input className="input" id="password" name="password" type="password" autoComplete="current-password" required minLength={6} placeholder="Sua senha"/></div>
           {error && <p role="alert" className="text-red-700 text-sm">Não foi possível entrar. Verifique suas credenciais.</p>}
           <button type="submit" className="btn w-full">Entrar no painel</button>
-        </form><p className="text-xs muted mt-8">Acesso restrito a usuários autorizados pela administração da igreja.</p>
+        </form><p className="text-xs muted mt-8">O acesso é criado por convite individual da administração. Já recebeu um convite? Abra o link enviado a você.</p><p className="text-xs muted mt-4">Acesso restrito a usuários autorizados pela administração da igreja.</p>
       </div>
     </section>
   </main>;

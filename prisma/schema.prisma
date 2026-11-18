@@ -33,6 +33,7 @@ model Church {
   unavailabilities Unavailability[]
   coordinators MinistryCoordinator[]
   swapRequests SwapRequest[]
+  invitations Invitation[]
 }
 
 model User {
@@ -47,6 +48,7 @@ model User {
   person       Person?
   coordinatedMinistries MinistryCoordinator[]
   requestedSwaps SwapRequest[]
+  sentInvitations Invitation[]
 }
 
 model Membership {
@@ -83,6 +85,7 @@ model Person {
   teamMemberships TeamMember[]
   scheduleAssignments ScheduleAssignment[]
   unavailabilities Unavailability[]
+  invitations Invitation[]
   @@unique([churchId, id])
   @@index([churchId, fullName])
 }
@@ -236,4 +239,24 @@ model SwapRequest {
   requester    User              @relation(fields: [requesterId], references: [id], onDelete: Restrict)
   @@index([churchId, ministryId, status])
   @@index([churchId, requesterId])
+}
+
+model Invitation {
+  id           String   @id @default(uuid()) @db.Uuid
+  churchId     String   @db.Uuid
+  personId     String   @db.Uuid
+  email        String   @db.VarChar(254)
+  role         Role     @default(VOLUNTARIO)
+  tokenHash    String   @unique @db.VarChar(64)
+  expiresAt    DateTime
+  usedAt       DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime @default(now())
+  createdById  String   @db.Uuid
+  church       Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  person       Person   @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
+  createdBy    User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  @@index([churchId, createdAt])
+  @@index([churchId, personId])
+  @@index([churchId, email])
 }

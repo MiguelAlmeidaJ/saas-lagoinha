@@ -44,3 +44,5 @@ jobs:
         run: node scripts/smoke-db.mjs
       - name: Verify scheduling migrations and swap constraints
         run: node scripts/smoke-scheduling.mjs
+      - name: Verify invitation persistence and one-time constraints
+        run: node scripts/smoke-invitations.mjs

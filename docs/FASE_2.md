@@ -26,3 +26,16 @@
 - Validar funcionamento dos contêineres localmente antes de usar dados reais
 
 **Decisão de projeto:** testes locais adiados a pedido do responsável. CI segue automatizado. Nenhum deploy em servidor próprio nesta etapa.
+
+## Próxima evolução — usuários e convites
+
+- Administração em /usuarios para ADMIN/PASTOR
+- Convites individuais a pessoas sem conta
+- Token aleatório, hash em banco, uso único e validade de 48h
+- Fluxo público de ativação em /ativar/[token]
+- Senha inicial escolhida pela pessoa e armazenada como bcrypt
+- Associação transacional de User, Membership e Person
+- Revogação de convites e registro de auditoria
+- Gestão de convites sem provedor externo de e-mail: cópia manual da URL
+- Teste de persistência no GitHub Actions
+- Limitações e proteções detalhadas em docs/CONVITES.md

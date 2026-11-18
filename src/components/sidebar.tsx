@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, UsersRound, HandHeart, CalendarDays, House, Wallet, HeartHandshake, Settings, LogOut, CalendarCheck2 } from "lucide-react";
+import { LayoutDashboard, UsersRound, HandHeart, CalendarDays, House, Wallet, HeartHandshake, Settings, LogOut, CalendarCheck2, UserCog } from "lucide-react";
 import { logout } from "@/app/(auth)/login/actions";
 import type { Role } from "@prisma/client";
 
@@ -7,6 +7,7 @@ const items = [
   { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard, active: true },
   { href: "/minhas-escalas", label: "Minhas escalas", icon: CalendarCheck2, active: true },
   { href: "/pessoas", label: "Pessoas", icon: UsersRound, active: true, roles: ["ADMIN","PASTOR","COORDENADOR"] as Role[] },
+  { href: "/usuarios", label: "Usuários e convites", icon: UserCog, active: true, roles: ["ADMIN","PASTOR"] as Role[] },
   { href: "/ministerios", label: "Ministérios", icon: HandHeart, active: true },
   { href: "/escalas", label: "Gerenciar escalas", icon: CalendarDays, active: true, roles: ["ADMIN","PASTOR","COORDENADOR"] as Role[] },
   { href: "#", label: "Grupos de crescimento", icon: House, active: false },
