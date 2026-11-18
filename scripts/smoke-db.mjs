@@ -1,5 +1,5 @@
-const assert = require("node:assert/strict");
-const { PrismaClient } = require("@prisma/client");
+import assert from "node:assert/strict";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 async function main() {

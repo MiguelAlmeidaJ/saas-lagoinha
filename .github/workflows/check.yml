@@ -41,4 +41,4 @@ jobs:
           ADMIN_PASSWORD: ci-test-password-strong
         run: npm run db:seed
       - name: Verify PostgreSQL records and roles
-        run: node scripts/smoke-db.cjs
+        run: node scripts/smoke-db.mjs
