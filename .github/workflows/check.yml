@@ -48,3 +48,5 @@ jobs:
         run: node scripts/smoke-invitations.mjs
       - name: Verify account-security storage and reset lifecycle
         run: node scripts/smoke-account-security.mjs
+      - name: Verify ministry authorization and cross-church isolation
+        run: npx tsx scripts/smoke-authorization.ts

@@ -29,7 +29,7 @@ export async function getAccess() {
   if (!token) return null;
   const session = await prisma.session.findUnique({
     where: { tokenHash: digest(token) },
-    include: { user: { include: { memberships: { include: { church: true }, take: 1 } } } }
+    include: { user: { include: { memberships: { include: { church: true }, orderBy: { churchId: "asc" }, take: 1 } } } }
   });
   if (!session || session.expiresAt <= new Date() || !session.user.active) return null;
   const membership = session.user.memberships[0];

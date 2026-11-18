@@ -19,7 +19,7 @@ export async function recordLoginFailure(email:string){
  // Um update condicional atômico serializa as tentativas por e-mail no banco.
  // A janela é reaberta se o registro ficou inativo por tempo suficiente.
  await prisma.$transaction(async tx=>{
-  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))::text AS locked`;
   const current=await tx.loginThrottle.findUnique({where:{emailHash:key}});
   const fresh=!current||current.updatedAt.getTime()<now.getTime()-WINDOW_MINUTES*60000;
   const failures=(fresh?0:current.failures)+1;

@@ -53,3 +53,17 @@
 - [ ] Validação do Docker local e servidor antes de dados reais
 
 **Situação:** Fase 2 funcionalmente extensa, mas ainda em desenvolvimento; não encerrar como concluída/validada até revisar os fluxos e a segurança.
+
+## Incremento final — auditoria de autorização e isolamento (18/11/2026)
+
+- [x] Testes automatizados para matriz de papéis (ADMIN, PASTOR, COORDENADOR, MEMBRO e VOLUNTARIO)
+- [x] Coordenador limitado aos ministérios explicitamente concedidos
+- [x] Vínculo obsoleto perde efeito se o usuário perde o papel ou é desativado
+- [x] FKs compostas impedem vincular equipe ou coordenador a ministério de outra igreja
+- [x] Consulta por igreja não revela vínculo de outra igreja
+- [x] Correção da instrução de advisory lock no controle de tentativas de login
+- [ ] Testes HTTP/E2E com sessão e ações reais dos diferentes perfis
+- [ ] Defesa completa contra operações simultâneas de atribuição e troca
+- [ ] Teste local no Docker, homologação da interface e revisão de deploy
+
+**Não marcar Fase 2 como validada para produção até realizar os itens pendentes.** O desenvolvimento funcional pode ser considerado avançado, mas testes locais continuam adiados conforme solicitação.
