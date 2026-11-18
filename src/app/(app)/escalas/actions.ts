@@ -8,6 +8,11 @@ import { Prisma, type AssignmentStatus } from "@prisma/client";
 
 function validId(value: string) { return /^[a-f0-9-]{36}$/i.test(value); }
 function fail(reason: string): never { redirect("/escalas?error=" + encodeURIComponent(reason)); }
+function volunteerResult(form: FormData, success: string): never {
+ const path=form.get("returnTo")==="minhas-escalas"?"/minhas-escalas":"/escalas";
+ revalidatePath("/escalas");revalidatePath("/minhas-escalas");
+ redirect(path+"?success="+encodeURIComponent(success));
+}
 async function manager() {
   const access = await requireAccess();
   if (!canSchedule(access.role)) fail("permissao");
@@ -124,7 +129,7 @@ export async function respondAssignment(form: FormData) {
   });
   if(updated.count) await audit(tx,churchId,user.id,"ScheduleAssignment",target.id,decision);
  });
- revalidatePath("/escalas"); redirect("/escalas?success=resposta");
+ volunteerResult(form,"resposta");
 }
 
 export async function addUnavailability(form: FormData) {
@@ -140,7 +145,7 @@ export async function addUnavailability(form: FormData) {
   const record=await tx.unavailability.create({data:{churchId,personId,startsAt,endsAt,reason}});
   await audit(tx,churchId,user.id,"Unavailability",record.id,"CREATE");
  });
- revalidatePath("/escalas"); redirect("/escalas?success=indisponibilidade");
+ volunteerResult(form,"indisponibilidade");
 }
 
 export async function linkAccount(form: FormData) {

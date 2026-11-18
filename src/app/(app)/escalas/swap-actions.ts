@@ -8,7 +8,11 @@ import { canManageMinistry } from "@/lib/scheduling";
 
 const uuid=(value:string)=>/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
 function fail(code:string):never { redirect("/escalas?error="+encodeURIComponent(code)); }
-function success(code:string):never { revalidatePath("/escalas");redirect("/escalas?success="+code); }
+function success(code:string,form?:FormData):never {
+ const path=form?.get("returnTo")==="minhas-escalas"?"/minhas-escalas":"/escalas";
+ revalidatePath("/escalas");revalidatePath("/minhas-escalas");
+ redirect(path+"?success="+code);
+}
 
 export async function requestSwap(form:FormData) {
  const {churchId,user}=await requireAccess();
@@ -28,7 +32,7 @@ export async function requestSwap(form:FormData) {
    await tx.auditLog.create({data:{churchId,actorId:user.id,entityType:"SwapRequest",entityId:request.id,operation:"REQUEST"}});
   });
  }catch{fail("solicitacao_ja_aberta");}
- success("troca_solicitada");
+ success("troca_solicitada",form);
 }
 
 export async function cancelSwap(form:FormData) {
@@ -41,7 +45,7 @@ export async function cancelSwap(form:FormData) {
   const updated=await tx.swapRequest.updateMany({where:{id:request.id,churchId,status:"PENDENTE"},data:{status:"CANCELADA",resolvedAt:new Date()}});
   if(updated.count) await tx.auditLog.create({data:{churchId,actorId:user.id,entityType:"SwapRequest",entityId:request.id,operation:"CANCEL"}});
  });
- success("troca_cancelada");
+ success("troca_cancelada",form);
 }
 
 export async function decideSwap(form:FormData) {
