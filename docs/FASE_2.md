@@ -39,3 +39,17 @@
 - Gestão de convites sem provedor externo de e-mail: cópia manual da URL
 - Teste de persistência no GitHub Actions
 - Limitações e proteções detalhadas em docs/CONVITES.md
+
+## Incremento — proteção de acesso e recuperação de senha
+- [x] Limite por e-mail: 5 falhas / 15 minutos, contador persistente no PostgreSQL
+- [x] Erros de login genéricos
+- [x] Recuperação por link individual emitido por administração autorizada
+- [x] Token somente como hash, uso único, validade de 30 minutos
+- [x] Revogação de links anteriores e invalidação de sessões depois da troca de senha
+- [x] Teste de persistência e restrições no GitHub Actions
+- [ ] Rate limiting de borda/IP e revisão de concorrência
+- [ ] Recuperação por e-mail com verificação de posse
+- [ ] Testes E2E com sessões reais, troca de perfil e dois tenants
+- [ ] Validação do Docker local e servidor antes de dados reais
+
+**Situação:** Fase 2 funcionalmente extensa, mas ainda em desenvolvimento; não encerrar como concluída/validada até revisar os fluxos e a segurança.

@@ -1,4 +1,5 @@
 import { login } from "./actions";
+import Link from "next/link";
 export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string; senha?: string }> }) {
   const { error, senha } = await searchParams;
   return <main className="min-h-screen grid lg:grid-cols-2">
@@ -18,7 +19,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
           {senha==="alterada" && <p role="status" className="text-green-800 text-sm">Senha alterada. Entre novamente.</p>}
           {error && <p role="alert" className="text-red-700 text-sm">Não foi possível entrar. Verifique suas credenciais.</p>}
           <button type="submit" className="btn w-full">Entrar no painel</button>
-        </form><p className="text-xs muted mt-8">O acesso é criado por convite individual da administração. Já recebeu um convite? Abra o link enviado a você.</p><p className="text-xs muted mt-4">Acesso restrito a usuários autorizados pela administração da igreja.</p>
+        </form><p className="text-xs muted mt-8">O acesso é criado por convite individual da administração. Já recebeu um convite? Abra o link enviado a você.</p><p className="text-xs muted mt-4">Acesso restrito a usuários autorizados pela administração da igreja.</p><p className="text-sm mt-5"><Link className="underline underline-offset-4" href="/recuperar-acesso">Esqueci minha senha</Link></p>
       </div>
     </section>
   </main>;

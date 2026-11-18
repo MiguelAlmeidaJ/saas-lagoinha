@@ -7,6 +7,7 @@ import { revokeInvite } from "./actions";
 import { changeUserRole, setUserActive } from "./manage-actions";
 import type { Role } from "@prisma/client";
 import { UserPlus, ShieldCheck } from "lucide-react";
+import { PasswordResetAdmin } from "@/components/users/password-reset-admin";
 export default async function UsersPage({searchParams}:{searchParams:Promise<{error?:string;success?:string}>}) {
  const {churchId,role,user}=await requireAccess();
  if(role!=="ADMIN"&&role!=="PASTOR") redirect("/dashboard");
@@ -41,7 +42,7 @@ export default async function UsersPage({searchParams}:{searchParams:Promise<{er
     const choices=(role==="ADMIN"?["MEMBRO","VOLUNTARIO","LIDER_GC","COORDENADOR","FINANCEIRO","PASTOR","ADMIN"]:["MEMBRO","VOLUNTARIO","LIDER_GC","COORDENADOR"]) as Role[];
     return <article key={m.user.id} className="border border-[#e5e2dc] rounded-xl p-4">
      <div className="flex items-start justify-between gap-3 flex-wrap">
-      <div><p className="font-semibold">{m.user.name}</p><p className="text-sm muted">{m.user.email}</p><p className="text-xs muted mt-2">{roleLabels[m.role]} • {m.user.active?"Ativo":"Inativo"}</p></div>
+      <div><p className="font-semibold">{m.user.name}</p><p className="text-sm muted">{m.user.email}</p><p className="text-xs muted mt-2">{roleLabels[m.role]} • {m.user.active?"Ativo":"Inativo"}</p>{m.user.active&&(role==="ADMIN"||["MEMBRO","VOLUNTARIO","COORDENADOR","LIDER_GC"].includes(m.role))&&<div className="mt-3"><PasswordResetAdmin userId={m.user.id} name={m.user.name}/></div>}</div>
       {editable?<div className="flex gap-3 flex-wrap items-end">
        <form action={changeUserRole} className="flex gap-2 items-end flex-wrap">
         <input type="hidden" name="userId" value={m.user.id}/>

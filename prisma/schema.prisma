@@ -34,6 +34,7 @@ model Church {
   coordinators MinistryCoordinator[]
   swapRequests SwapRequest[]
   invitations Invitation[]
+  passwordResets PasswordReset[]
 }
 
 model User {
@@ -49,6 +50,8 @@ model User {
   coordinatedMinistries MinistryCoordinator[]
   requestedSwaps SwapRequest[]
   sentInvitations Invitation[]
+  passwordResets PasswordReset[] @relation("PasswordResetAccount")
+  issuedPasswordResets PasswordReset[] @relation("PasswordResetIssuedBy")
 }
 
 model Membership {
@@ -259,4 +262,28 @@ model Invitation {
   @@index([churchId, createdAt])
   @@index([churchId, personId])
   @@index([churchId, email])
+}
+
+model LoginThrottle {
+  emailHash   String   @id @db.VarChar(64)
+  failures    Int      @default(0)
+  lockedUntil DateTime?
+  updatedAt   DateTime @default(now())
+}
+
+model PasswordReset {
+  id          String    @id @default(uuid()) @db.Uuid
+  churchId    String    @db.Uuid
+  userId      String    @db.Uuid
+  tokenHash   String    @unique @db.VarChar(64)
+  createdById String    @db.Uuid
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  church      Church    @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  user        User      @relation("PasswordResetAccount", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation("PasswordResetIssuedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  @@index([churchId, userId])
+  @@index([churchId, createdAt])
 }
