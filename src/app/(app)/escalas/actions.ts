@@ -157,3 +157,67 @@ export async function linkAccount(form: FormData) {
  }catch{fail("conta_vinculada");}
  revalidatePath("/escalas");redirect("/escalas?success=vinculo");
 }
+
+/** Cria até oito eventos semanais em uma única transação. */
+export async function createRecurringEvents(form: FormData) {
+ const {churchId,user}=await manager();
+ const ministryId=String(form.get("ministryId")??"");
+ const title=String(form.get("title")??"").trim();
+ const location=String(form.get("location")??"").trim()||null;
+ const startsAt=parseChurchDate(String(form.get("startsAt")??""));
+ const endsAt=parseChurchDate(String(form.get("endsAt")??""));
+ const count=Number(form.get("count"));
+ if(!validId(ministryId)||title.length<2||title.length>160||(location&&location.length>160)||
+    !startsAt||!endsAt||endsAt<=startsAt||!Number.isInteger(count)||count<2||count>8) fail("validacao");
+ if(!await prisma.ministry.findFirst({where:{churchId,id:ministryId}})) fail("ministerio");
+ const WEEK=7*24*60*60*1000;
+ await prisma.$transaction(async tx=>{
+  for(let i=0;i<count;i++){
+   const event=await tx.serviceEvent.create({data:{
+    churchId,ministryId,title,location,
+    startsAt:new Date(startsAt.getTime()+WEEK*i),
+    endsAt:new Date(endsAt.getTime()+WEEK*i)
+   }});
+   await audit(tx,churchId,user.id,"ServiceEvent",event.id,"CREATE_RECURRING");
+  }
+ });
+ revalidatePath("/escalas");redirect("/escalas?success=recorrencia");
+}
+
+/** Substituição administrativa. Mantém o histórico do evento em audit_log. */
+export async function replaceVolunteer(form: FormData) {
+ const {churchId,user}=await manager();
+ const assignmentId=String(form.get("assignmentId")??"");
+ const newPersonId=String(form.get("personId")??"");
+ if(!validId(assignmentId)||!validId(newPersonId)) fail("validacao");
+ try {
+  await prisma.$transaction(async tx=>{
+   const original=await tx.scheduleAssignment.findFirst({
+    where:{id:assignmentId,churchId},include:{event:true}
+   });
+   if(!original) throw new Error("escala");
+   if(original.personId===newPersonId) throw new Error("mesma_pessoa");
+   const team=await tx.teamMember.findFirst({where:{
+    churchId,ministryId:original.ministryId,personId:newPersonId,active:true
+   }});
+   if(!team) throw new Error("nao_equipe");
+   const conflicting=await tx.scheduleAssignment.findFirst({where:{
+    churchId,personId:newPersonId,status:{not:"RECUSADA"},
+    event:{startsAt:{lt:original.event.endsAt},endsAt:{gt:original.event.startsAt}}
+   }});
+   const unavailable=await tx.unavailability.findFirst({where:{
+    churchId,personId:newPersonId,startsAt:{lt:original.event.endsAt},endsAt:{gt:original.event.startsAt}
+   }});
+   if(conflicting||unavailable) throw new Error("conflito");
+   await tx.scheduleAssignment.update({
+    where:{id:original.id},data:{personId:newPersonId,status:"PENDENTE",respondedAt:null}
+   });
+   await audit(tx,churchId,user.id,"ScheduleAssignment",original.id,
+    "REPLACE:"+original.personId+"->"+newPersonId);
+  },{isolationLevel:Prisma.TransactionIsolationLevel.Serializable});
+ }catch(e){
+  const reason=e instanceof Error&&["escala","mesma_pessoa","nao_equipe","conflito"].includes(e.message)?e.message:"substituicao";
+  fail(reason);
+ }
+ revalidatePath("/escalas");redirect("/escalas?success=substituicao");
+}

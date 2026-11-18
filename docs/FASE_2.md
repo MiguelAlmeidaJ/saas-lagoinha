@@ -1,28 +1,25 @@
-# Fase 2 — Voluntários e escalas
+# Fase 2 — Voluntários e Escalas
 
-## Implementação inicial na branch create
+## Incremento de desenvolvimento
+- Vínculos de voluntários e funções por ministério
+- Eventos com data, local e horário
+- Escalas e confirmação/recusa
+- Indisponibilidades e validação inicial de conflitos
+- Formulário de escala com pessoas/funções filtradas pelo ministério
+- Calendário mensal com navegação
+- Substituição administrativa de voluntários com auditoria
+- Geração de séries de 2 a 8 eventos semanais
 
-- Cadastro de equipes por ministério (vínculo Pessoa x Ministério)
-- Cadastro de funções de serviço
-- Cultos e eventos com data/hora, local e ministério responsável
-- Escala individual com status pendente, confirmada ou recusada
-- Detecção inicial de conflito de horário e indisponibilidade
-- Indisponibilidade da pessoa vinculada ao usuário
-- Confirmação ou recusa da escala pela conta vinculada
-- Registro de auditoria das principais operações
-- Filtragem por igreja em queries e chaves estrangeiras compostas
-- Página /escalas responsiva
+## Atenção
+A recorrência cria eventos independentes; não edita toda uma série.
+A substituição mantém o mesmo registro e reinicia a confirmação. O log identifica o usuário substituído.
+O calendário deve mostrar somente dados autorizados ao papel corrente.
+Não há execução local de Docker nesta etapa a pedido do responsável.
 
-## Limitações e próximos incrementos
-
-- [ ] Testes de build/Prisma migration e fluxos E2E
-- [ ] Onboarding/convites e vínculo de conta mais amigável
-- [ ] Filtro dependente por ministério no formulário de escala
-- [ ] Reforçar exclusividade de escalas concorrentes em transações simultâneas
-- [ ] Edição/cancelamento e substituição de escalas
-- [ ] Escalas recorrentes, notificações por WhatsApp, sugestões inteligentes
-- [ ] Gestão granular dos coordenadores por ministério
-- [ ] Refinar autorização da visualização de eventos e privacidade
-- [ ] Reavaliar fusos horários para operações fora de Brasília
-
-Os testes locais de Docker foram adiados a pedido do responsável. Não marcar a fase como validada.
+## Próximos incrementos
+- Testes de autorização de todos os papéis e isolamento entre igrejas
+- Fluxo de convites, gestão granular de coordenadores e recuperação de senha
+- Trocas solicitadas pelo voluntário com aprovação do líder
+- Escalas recorrentes com edição da série
+- Integração oficial de notificações e confirmação WhatsApp
+- Travamento contra concorrência para atribuições simultâneas
