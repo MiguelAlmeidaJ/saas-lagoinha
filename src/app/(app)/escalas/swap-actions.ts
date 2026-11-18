@@ -7,8 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { canManageMinistry } from "@/lib/scheduling";
 
 const uuid=(value:string)=>/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
-const fail=(code:string):never=>redirect("/escalas?error="+encodeURIComponent(code));
-const success=(code:string):never=>{revalidatePath("/escalas");redirect("/escalas?success="+code);};
+function fail(code:string):never { redirect("/escalas?error="+encodeURIComponent(code)); }
+function success(code:string):never { revalidatePath("/escalas");redirect("/escalas?success="+code); }
 
 export async function requestSwap(form:FormData) {
  const {churchId,user}=await requireAccess();
