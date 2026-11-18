@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
 const db = new PrismaClient();
 const digest=t=>createHash("sha256").update(t).digest("hex");
 
@@ -23,7 +23,7 @@ async function main() {
  const created=await db.$transaction(async tx=>{
   const updated=await tx.invitation.updateMany({where:{id:record.id,usedAt:null,revokedAt:null,expiresAt:{gt:new Date()}},data:{usedAt:new Date()}});
   assert.equal(updated.count,1);
-  const user=await tx.user.create({data:{name:person.fullName,email:person.email,passwordHash:await hash("senha-para-teste-local",12)}});
+  const user=await tx.user.create({data:{name:person.fullName,email:person.email,passwordHash:await bcrypt.hash("senha-para-teste-local",12)}});
   await tx.membership.create({data:{churchId:church.id,userId:user.id,role:"VOLUNTARIO"}});
   await tx.person.update({where:{id:person.id},data:{userId:user.id}});
   return user;

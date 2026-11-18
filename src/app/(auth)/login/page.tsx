@@ -1,6 +1,6 @@
 import { login } from "./actions";
-export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string; senha?: string }> }) {
+  const { error, senha } = await searchParams;
   return <main className="min-h-screen grid lg:grid-cols-2">
     <section className="hidden lg:flex flex-col justify-between bg-[#22221f] p-14 text-white">
       <div className="text-xl font-bold tracking-wide">LAGOINHA <span className="text-[#c4ac7c]">/</span> ALÉM PARAÍBA</div>
@@ -15,6 +15,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
         <form action={login} className="space-y-5">
           <div><label htmlFor="email" className="block text-sm font-semibold mb-2">E-mail</label><input className="input" id="email" name="email" type="email" autoComplete="email" required placeholder="seu@email.com"/></div>
           <div><label htmlFor="password" className="block text-sm font-semibold mb-2">Senha</label><input className="input" id="password" name="password" type="password" autoComplete="current-password" required minLength={6} placeholder="Sua senha"/></div>
+          {senha==="alterada" && <p role="status" className="text-green-800 text-sm">Senha alterada. Entre novamente.</p>}
           {error && <p role="alert" className="text-red-700 text-sm">Não foi possível entrar. Verifique suas credenciais.</p>}
           <button type="submit" className="btn w-full">Entrar no painel</button>
         </form><p className="text-xs muted mt-8">O acesso é criado por convite individual da administração. Já recebeu um convite? Abra o link enviado a você.</p><p className="text-xs muted mt-4">Acesso restrito a usuários autorizados pela administração da igreja.</p>
