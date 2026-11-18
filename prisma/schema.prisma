@@ -31,6 +31,8 @@ model Church {
   ministryFunctions MinistryFunction[]
   scheduleAssignments ScheduleAssignment[]
   unavailabilities Unavailability[]
+  coordinators MinistryCoordinator[]
+  swapRequests SwapRequest[]
 }
 
 model User {
@@ -43,6 +45,8 @@ model User {
   memberships  Membership[]
   sessions     Session[]
   person       Person?
+  coordinatedMinistries MinistryCoordinator[]
+  requestedSwaps SwapRequest[]
 }
 
 model Membership {
@@ -94,6 +98,8 @@ model Ministry {
   functions MinistryFunction[]
   events ServiceEvent[]
   assignments ScheduleAssignment[]
+  coordinators MinistryCoordinator[]
+  swapRequests SwapRequest[]
   @@unique([churchId, id])
   @@unique([churchId, name])
 }
@@ -175,6 +181,8 @@ model ScheduleAssignment {
   event       ServiceEvent @relation(fields: [churchId, eventId], references: [churchId, id], onDelete: Cascade)
   person      Person @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
   function    MinistryFunction? @relation(fields: [churchId, functionId], references: [churchId, id], onDelete: Restrict)
+  swapRequests SwapRequest[]
+  @@unique([churchId, id])
   @@unique([churchId, eventId, personId])
   @@index([churchId, personId])
 }
@@ -189,4 +197,43 @@ model Unavailability {
   church    Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
   person    Person @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
   @@index([churchId, personId, startsAt])
+}
+
+enum SwapRequestStatus {
+  PENDENTE
+  APROVADA
+  RECUSADA
+  CANCELADA
+}
+
+model MinistryCoordinator {
+  id         String   @id @default(uuid()) @db.Uuid
+  churchId   String   @db.Uuid
+  ministryId String   @db.Uuid
+  userId     String   @db.Uuid
+  createdAt  DateTime @default(now())
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry   Ministry @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([churchId, ministryId, userId])
+  @@index([churchId, userId])
+}
+
+model SwapRequest {
+  id           String            @id @default(uuid()) @db.Uuid
+  churchId     String            @db.Uuid
+  ministryId   String            @db.Uuid
+  assignmentId String            @db.Uuid
+  requesterId  String            @db.Uuid
+  reason       String?           @db.VarChar(500)
+  status       SwapRequestStatus @default(PENDENTE)
+  createdAt    DateTime          @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?           @db.Uuid
+  church       Church            @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry     Ministry          @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  assignment   ScheduleAssignment @relation(fields: [churchId, assignmentId], references: [churchId, id], onDelete: Cascade)
+  requester    User              @relation(fields: [requesterId], references: [id], onDelete: Restrict)
+  @@index([churchId, ministryId, status])
+  @@index([churchId, requesterId])
 }
