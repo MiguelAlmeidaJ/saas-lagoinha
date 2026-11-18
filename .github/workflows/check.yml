@@ -42,3 +42,5 @@ jobs:
         run: npm run db:seed
       - name: Verify PostgreSQL records and roles
         run: node scripts/smoke-db.mjs
+      - name: Verify scheduling migrations and swap constraints
+        run: node scripts/smoke-scheduling.mjs

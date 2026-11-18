@@ -23,3 +23,18 @@ Não há execução local de Docker nesta etapa a pedido do responsável.
 - Escalas recorrentes com edição da série
 - Integração oficial de notificações e confirmação WhatsApp
 - Travamento contra concorrência para atribuições simultâneas
+
+## Trocas solicitadas e permissões (incremento 3)
+
+- Voluntário vinculado à conta solicita troca em sua própria escala futura, com motivo opcional
+- Apenas um pedido pendente por escala (índice parcial no PostgreSQL)
+- Voluntário pode cancelar seu pedido pendente
+- Coordenador autorizado por ministério, administrador ou pastor pode aprovar/recusar
+- Autoaprovação do próprio solicitante não é permitida
+- Aprovação exige substituto ativo no mesmo ministério, sem conflito ou indisponibilidade
+- Nova atribuição volta ao estado pendente para confirmação
+- Associação de coordenador por ministério concedida ou revogada por admin/pastor
+- Auditoria de solicitações, decisões e permissões
+- CI agora valida estrutura de trocas e isolamento por chaves estrangeiras compostas
+
+**Pendente**: testes de fluxo HTTP com sessões reais, notificações, revisão de UX no dispositivo e concorrência sob carga. No momento não se exige execução local.
