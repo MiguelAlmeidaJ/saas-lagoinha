@@ -1,0 +1,2 @@
+import { logout } from "@/app/(auth)/login/actions";
+export default function NoAccess() { return <main className="min-h-screen flex items-center justify-center p-6"><section className="panel max-w-md"><p className="eyebrow">Acesso pendente</p><h1 className="text-2xl font-semibold mt-2">Sua conta ainda não está vinculada a uma igreja.</h1><p className="muted my-5">Peça ao administrador para liberar o acesso.</p><form action={logout}><button className="btn">Sair</button></form></section></main>; }

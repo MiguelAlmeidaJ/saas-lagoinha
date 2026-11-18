@@ -1,0 +1,17 @@
+@import "tailwindcss";
+:root { --background: #f6f5f2; --foreground: #22221f; --accent: #b49a6a; --border: #e5e2dc; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+button, input, select { font: inherit; }
+a { text-decoration: none; }
+.input { width: 100%; border: 1px solid var(--border); background: white; padding: 12px 14px; border-radius: 10px; outline-color: var(--accent); }
+.btn { border: 0; border-radius: 10px; background: #22221f; color: #fff; padding: 12px 18px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: #48453c; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.panel { border: 1px solid var(--border); background: white; border-radius: 18px; padding: 24px; }
+.eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: 11px; font-weight: 700; color: #8b7959; }
+.muted { color: #77756e; }
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; font-size: 12px; color: #77756e; font-weight: 600; padding: 12px; }
+.table td { border-top: 1px solid var(--border); padding: 14px 12px; font-size: 14px; }
+@media(max-width:760px){ .panel { padding: 18px; } .table-wrap { overflow-x:auto; } }
