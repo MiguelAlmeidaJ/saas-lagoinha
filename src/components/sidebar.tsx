@@ -5,7 +5,7 @@ const items = [
   { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard, active: true },
   { href: "/pessoas", label: "Pessoas", icon: UsersRound, active: true },
   { href: "/ministerios", label: "Ministérios", icon: HandHeart, active: true },
-  { href: "#", label: "Escalas", icon: CalendarDays, active: false },
+  { href: "/escalas", label: "Escalas", icon: CalendarDays, active: true },
   { href: "#", label: "Grupos de crescimento", icon: House, active: false },
   { href: "#", label: "Financeiro", icon: Wallet, active: false },
   { href: "#", label: "Pastoral", icon: HeartHandshake, active: false },

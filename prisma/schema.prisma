@@ -26,6 +26,11 @@ model Church {
   people    Person[]
   ministries Ministry[]
   auditLogs AuditLog[]
+  serviceEvents ServiceEvent[]
+  teamMembers TeamMember[]
+  ministryFunctions MinistryFunction[]
+  scheduleAssignments ScheduleAssignment[]
+  unavailabilities Unavailability[]
 }
 
 model User {
@@ -37,6 +42,7 @@ model User {
   createdAt    DateTime     @default(now())
   memberships  Membership[]
   sessions     Session[]
+  person       Person?
 }
 
 model Membership {
@@ -68,6 +74,12 @@ model Person {
   phone     String?  @db.VarChar(30)
   createdAt DateTime @default(now())
   church    Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  userId    String?  @unique @db.Uuid
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  teamMemberships TeamMember[]
+  scheduleAssignments ScheduleAssignment[]
+  unavailabilities Unavailability[]
+  @@unique([churchId, id])
   @@index([churchId, fullName])
 }
 
@@ -78,6 +90,11 @@ model Ministry {
   description String?  @db.VarChar(500)
   createdAt   DateTime @default(now())
   church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  teamMembers TeamMember[]
+  functions MinistryFunction[]
+  events ServiceEvent[]
+  assignments ScheduleAssignment[]
+  @@unique([churchId, id])
   @@unique([churchId, name])
 }
 
@@ -91,4 +108,85 @@ model AuditLog {
   createdAt  DateTime @default(now())
   church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   @@index([churchId, createdAt])
+}
+
+enum AssignmentStatus {
+  PENDENTE
+  CONFIRMADA
+  RECUSADA
+}
+
+model TeamMember {
+  id         String   @id @default(uuid()) @db.Uuid
+  churchId   String   @db.Uuid
+  ministryId String   @db.Uuid
+  personId   String   @db.Uuid
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry   Ministry @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  person     Person   @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
+  @@unique([churchId, ministryId, personId])
+  @@index([churchId, personId])
+}
+
+model MinistryFunction {
+  id         String   @id @default(uuid()) @db.Uuid
+  churchId   String   @db.Uuid
+  ministryId String   @db.Uuid
+  name       String   @db.VarChar(100)
+  church     Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry   Ministry @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  assignments ScheduleAssignment[]
+  @@unique([churchId, id])
+  @@unique([churchId, ministryId, name])
+  @@index([churchId, ministryId])
+}
+
+model ServiceEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  churchId    String   @db.Uuid
+  ministryId  String   @db.Uuid
+  title       String   @db.VarChar(160)
+  startsAt    DateTime
+  endsAt      DateTime
+  location    String?  @db.VarChar(160)
+  createdAt   DateTime @default(now())
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry    Ministry @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  assignments ScheduleAssignment[]
+  @@unique([churchId, id])
+  @@index([churchId, startsAt])
+  @@index([churchId, ministryId])
+}
+
+model ScheduleAssignment {
+  id          String @id @default(uuid()) @db.Uuid
+  churchId    String @db.Uuid
+  ministryId  String @db.Uuid
+  eventId     String @db.Uuid
+  personId    String @db.Uuid
+  functionId  String? @db.Uuid
+  status      AssignmentStatus @default(PENDENTE)
+  respondedAt DateTime?
+  createdAt   DateTime @default(now())
+  church      Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  ministry    Ministry @relation(fields: [churchId, ministryId], references: [churchId, id], onDelete: Cascade)
+  event       ServiceEvent @relation(fields: [churchId, eventId], references: [churchId, id], onDelete: Cascade)
+  person      Person @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
+  function    MinistryFunction? @relation(fields: [churchId, functionId], references: [churchId, id], onDelete: Restrict)
+  @@unique([churchId, eventId, personId])
+  @@index([churchId, personId])
+}
+
+model Unavailability {
+  id        String @id @default(uuid()) @db.Uuid
+  churchId  String @db.Uuid
+  personId  String @db.Uuid
+  startsAt  DateTime
+  endsAt    DateTime
+  reason    String? @db.VarChar(250)
+  church    Church @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  person    Person @relation(fields: [churchId, personId], references: [churchId, id], onDelete: Cascade)
+  @@index([churchId, personId, startsAt])
 }
